@@ -7,10 +7,7 @@ Class {
 { #category : #accessing }
 CynAbstractPropertySlot class >> propertyCategory [
 
-	| aCynAbstractPropertySlot |
-	aCynAbstractPropertySlot := self new.
-
-	aCynAbstractPropertySlot subclassResponsibility
+	self subclassResponsibility
 ]
 
 { #category : #accessing }
