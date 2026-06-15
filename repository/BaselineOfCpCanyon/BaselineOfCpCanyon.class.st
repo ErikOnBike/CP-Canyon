@@ -17,9 +17,9 @@ BaselineOfCpCanyon >> baseline: spec [
 
 		"Packages"
 		spec
-			package: 'CodeParadise-Canyon-Model' with: [ spec requires: #('CodeParadise-RemoteEnvironment') ];
-			package: 'CodeParadise-Canyon-Data' with: [ spec requires: #('CodeParadise-Canyon-Model' 'CodeParadise-NodeJS-REST') ];
-			package: 'CodeParadise-Canyon-App' with: [ spec requires: #('CodeParadise-Canyon-Model' 'CodeParadise-WebApplication-Ionic' 'CodeParadise-WebApplication-Snapshot') ];
+			package: 'CodeParadise-Canyon-Model' with: [ spec requires: #('CodeParadise') ];
+			package: 'CodeParadise-Canyon-Data' with: [ spec requires: #('CodeParadise-Canyon-Model') ];
+			package: 'CodeParadise-Canyon-App' with: [ spec requires: #('CodeParadise-Canyon-Model') ];
 			package: 'CodeParadise-Canyon-Development' with: [ spec requires: #('CodeParadise-Canyon-App') ].
 
 		"Groups"
