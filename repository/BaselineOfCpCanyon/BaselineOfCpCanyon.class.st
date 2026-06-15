@@ -13,5 +13,5 @@ BaselineOfCpCanyon >> baseline: spec [
 
 		"Load dependencies"
 		spec
-			baseline: 'CodeParadise' with: [ spec repository: 'github://ErikOnBike/CodeParadise' ].
+			baseline: 'CodeParadise' with: [ spec repository: 'github://ErikOnBike/CodeParadise' ] ].
 ]
