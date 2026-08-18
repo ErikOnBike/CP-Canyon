@@ -8,7 +8,7 @@ Loading Canyon can be done using:
 
 ```Smalltalk
 Metacello new
-  repository: 'github://ErikOnBike/CP-Canyon';
+  repository: 'github://ErikOnBike/CP-Canyon:main';
   baseline: 'CpCanyon';
   load.
 ```
