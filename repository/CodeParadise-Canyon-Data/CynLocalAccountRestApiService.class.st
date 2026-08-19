@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 "
 Class {
 	#name : #CynLocalAccountRestApiService,
-	#superclass : #CynBaseRestApiService,
+	#superclass : #CynRestApiService,
 	#category : #'CodeParadise-Canyon-Data-Service'
 }
 
@@ -147,6 +147,33 @@ CynLocalAccountRestApiService >> alreadyCreatedMailMessage [
 		subject: 'Account already created' ;
 		text: ('An attempt was made to create an account belonging to this email address, but the account is already created.') ;
 		yourself
+]
+
+{ #category : #logging }
+CynLocalAccountRestApiService >> clientLogRecordFrom: aDictionary [
+
+	| logRecord accessToken session |
+
+	logRecord := (super clientLogRecordFrom: aDictionary)
+		ifNil: [ ^ nil ].
+
+	"Validate the access token is valid (but may be expired, so no check on existance)"
+	accessToken := aDictionary at: #accessToken ifAbsent: [ ^ nil ].
+	(CynTokenPropertyConstraint isValidValue: accessToken)
+		ifFalse: [ ^ nil ].
+
+	"Retrieve session (or nil if none exists, which is probably an expired session)"
+	session := modelDatabase
+		selectOne: #sessionForLogging
+		statement: 'SELECT id, accountId FROM sessions WHERE accessToken=:accessToken'
+		bind: { #accessToken -> accessToken } asDictionary.
+
+	"Explicitly add accont and session id (even if nil)"
+	logRecord
+		at: #accountId put: (session ifNotNil: [ session at: #accountId ]) ;
+		at: #sessionId put: (session ifNotNil: [ session at: #id ]).
+
+	^ logRecord
 ]
 
 { #category : #'API - accounts' }
@@ -311,14 +338,6 @@ CynLocalAccountRestApiService >> errorNonActivatedAccountDuringLogin [
 	CpNodeJSRestConflictError signal: 'Account not activated'
 ]
 
-{ #category : #accessing }
-CynLocalAccountRestApiService >> errorNotificationMailAccount [
-
-	"Answer the mail account where notifications should be sent"
-
-	^ config at: #errorNotificationMailAccount ifAbsent: [ nil ]
-]
-
 { #category : #errors }
 CynLocalAccountRestApiService >> errorTokenExpired [
 
@@ -417,45 +436,6 @@ CynLocalAccountRestApiService >> isExpiredSession: aSession [
 				ifTrue: [ ^ false ] ].
 
 	^ true
-]
-
-{ #category : #API }
-CynLocalAccountRestApiService >> log: aRestRequest response: aRestResponse [
-
-	"Log the client message.
-	This endpoint is to be used for storing relevant client side events (including errors).
-
-	Implementation:
-	It is assumed this endpoint is called used the CpBrowserNavigator >> sendBeacon:data:
-	method. This mechanism does not offer any means to add authentication data to the
-	request header. Authentication is therefore done based on the body content.
-	Beacon requests do not expect a result, therefore silently ignore any errors."
-
-	<post: '/api/log'>
-	<public>
-
-	[ self notifyLog: (self writeClientLogFrom: aRestRequest) ] on: Error do: [ :error | "ignore errors" ].
-
-	"Beacon requests do not expect a response"
-	super send: Dictionary new response: aRestResponse
-]
-
-{ #category : #logging }
-CynLocalAccountRestApiService >> logError: anError request: aRestRequest [
-
-	^ self notifyLog: (super logError: anError request: aRestRequest)
-]
-
-{ #category : #logging }
-CynLocalAccountRestApiService >> logInfoMessage: aString request: aRestRequest [
-
-	"Do not log for logging API call"
-
-	aRestRequest ifNotNil: [
-		aRestRequest path asString = '/api/log'
-			ifTrue: [ ^ nil ] ].
-
-	^ super logInfoMessage: aString request: aRestRequest
 ]
 
 { #category : #logging }
@@ -574,125 +554,6 @@ CynLocalAccountRestApiService >> matchPassword: plainTextPassword withHash: hash
 	hash := self hashPassword: plainTextPassword usingSalt: salt.
 
 	^ hashedPassword = hash
-]
-
-{ #category : #accessing }
-CynLocalAccountRestApiService >> notificationTimeout [
-
-	"Answer the timeout before sending the same/similar notification again (in seconds).
-
-	By default this is 30 minutes."
-
-	^ config at: #notificationTimeout ifAbsent: [ 1800 ]
-]
-
-{ #category : #accessing }
-CynLocalAccountRestApiService >> notificationWindow [
-
-	"Answer the time frame in which a certain amount of notifications can be sent (in seconds).
-	The amount is specified by #notificationWindowCount.
-
-	By default this is 2 hours."
-
-	^ config at: #notificationWindow ifAbsent: [ 7200 ]
-]
-
-{ #category : #accessing }
-CynLocalAccountRestApiService >> notificationWindowCount [
-
-	"Answer the amount of notifications which can be sent in a fixed time frame.
-	The time frame is specified by #notificationWindow.
-
-	By default this is 4."
-
-	^ config at: #notificationWindowCount ifAbsent: [ 4 ]
-]
-
-{ #category : #notifying }
-CynLocalAccountRestApiService >> notify: messageString statusCode: statusCodeInteger stack: stackString forLogId: logIdInteger [
-
-	"Notify by sending a mail to the admin and then adding entry to the database"
-
-	| notificationMessage |
-
-	notificationMessage := self newMailMessage
-		to: self errorNotificationMailAccount ;
-		subject: 'Error in ', (self class nameWithoutPrefix withoutSuffix: 'RestApiService') ;
-		html: ('<h1>Error: {1}</h1><h3>Statuscode: {2}</h3><h3>Stack trace:</h3><pre>{3}</pre>' format: { messageString . statusCodeInteger printString . stackString }) ;
-		yourself.
-
-	self sendMail: notificationMessage thenDo: [ :error :info |
-		error ifNotNil: [ self errorCr: 'Failed to send notification: ', error printString ] ].
-
-	logDatabase ifNil: [ ^ self ].
-
-	[ logDatabase
-		performOne: #addNotification
-		statement: 'INSERT INTO notifications (timestamp, logId, statusCode, message) VALUES(:now, :logId, :statusCode, :message)'
-		bind: {
-			#now -> CpJavaScriptDate timestampNow.
-			#logId -> logIdInteger.
-			#statusCode -> statusCodeInteger.
-			#message -> messageString } asDictionary
-	] on: Error do: [ :error | self errorCr: 'Failed to store notification: ', error printString ]
-]
-
-{ #category : #notifying }
-CynLocalAccountRestApiService >> notifyLog: anInteger [
-
-	"Notify about the log entry.
-	Answer the log id provided."
-
-	| logRecord notificationCount recently |
-
-	anInteger ifNil: [ ^ nil ].
-
-	self shouldNotify
-		ifFalse: [ ^ anInteger ].
-
-	logDatabase ifNil: [ ^ anInteger ].
-
-	"Retrieve log record"
-	logRecord := logDatabase
-		selectOne: #recentLogEntry
-		statement: 'SELECT statusCode, message, stack FROM logs WHERE id=:id'
-		bind: { #id -> anInteger } asDictionary.
-	logRecord ifNil: [ ^ anInteger ].
-
-	(self shouldNotifyStatusCode: (logRecord at: #statusCode))
-		ifFalse: [ ^ anInteger ].
-
-	"Check if a recent notification is made for a similar log entry.
-	If recently notified, do not notify again."
-	recently := CpJavaScriptDate timestampNow - self notificationTimeout.
-	logDatabase
-		exists: #notificationExists
-		statement: 'SELECT id FROM notifications WHERE timestamp >= :recently AND statusCode=:statusCode AND message=:message'
-		bind: {
-			#recently -> recently.
-			#statusCode -> (logRecord at: #statusCode).
-			#message -> (logRecord at: #message) } asDictionary
-		ifTrue: [ ^ anInteger ].
-
-	"Check total amount of recent notifications"
-	recently := CpJavaScriptDate timestampNow - self notificationWindow.
-	notificationCount := logDatabase
-		selectCount: #countRecentNotifications
-		statement: 'SELECT count(*) FROM notifications WHERE timestamp >= :recently AND (statusCode>=500 OR statusCode=0)'
-		bind: { #recently -> recently } asDictionary.
-
-	"If too many notifications, do not notify again"
-	notificationCount > self notificationWindowCount
-		ifTrue: [ ^ anInteger ].
-
-	"Do notify"
-	self
-		notify: (logRecord at: #message)
-		statusCode: (logRecord at: #statusCode)
-		stack: (logRecord at: #stack)
-		forLogId: anInteger.
-
-	^ anInteger
 ]
 
 { #category : #'API - accounts' }
@@ -845,29 +706,6 @@ CynLocalAccountRestApiService >> sessionExpirationDuration [
 	^ config at: #sessionExpirationDuration ifAbsent: [ 1800 ]
 ]
 
-{ #category : #notifying }
-CynLocalAccountRestApiService >> shouldNotify [
-
-	^ self errorNotificationMailAccount isNotNil
-]
-
-{ #category : #notifying }
-CynLocalAccountRestApiService >> shouldNotifyStatusCode: anInteger [
-
-	"Only notify internal server errors or client errors (statusCode = 0)"
-
-	^ anInteger >= 500 or: [ anInteger = 0 or: [ anInteger = CpNodeJSRestForbiddenError ] ]
-]
-
-{ #category : #logging }
-CynLocalAccountRestApiService >> updateLogResponse: aRestResponse [
-
-	"Update the log entry with status code.
-	Add notification for the entry."
-
-	^ self notifyLog: (super updateLogResponse: aRestResponse)
-]
-
 { #category : #'API - settings' }
 CynLocalAccountRestApiService >> updateSettings: aDictionary forAccountId: aString [
 
@@ -961,52 +799,4 @@ CynLocalAccountRestApiService >> validateAuthorizedRequest: aRestRequest [
 
 	"Store the accountId for later usage"
 	aRestRequest propertyAt: #accountId put: (session at: #accountId)
-]
-
-{ #category : #'API - logging' }
-CynLocalAccountRestApiService >> writeClientLogFrom: aRestRequest [
-
-	"Write the client log from the request. The client send this log request using Beacon API.
-	Validate the body contains a accessToken (which may already be expired, but should be known).
-	Without an access token, ignore the log (otherwise there will be the opportunity to fill our
-	logging DB with trash).
-	Answer the id of the log row created (or nil if none is created)."
-
-	| body accessToken session level message logRecord |
-
-	logDatabase ifNil: [ ^ nil ].
-
-	body := (aRestRequest jsonBody)
-		ifNil: [ ^ nil ].
-
-	"Validate the access token exists (but may be expired)"
-	accessToken := body at: #accessToken ifAbsent: [ ^ nil ].
-	(CynTokenPropertyConstraint isValidValue: accessToken)
-		ifFalse: [ ^ nil ].
-	session := modelDatabase
-		selectOne: #sessionForLogging
-		statement: 'SELECT id, accountId FROM sessions WHERE accessToken=:accessToken'
-		bind: { #accessToken -> accessToken } asDictionary.
-
-	level := body at: #level ifAbsent: [ ^ nil ].
-	message := body at: #message ifAbsent: [ ^ nil ].
-
-	logRecord := {
-		#timestamp -> CpJavaScriptDate timestampNow.
-		#level -> level.
-		#message -> ('Client log: ', message).
-		#statusCode -> 0.
-		#accountId -> (session ifNotNil: [ session at: #accountId ]).
-		#sessionId -> (session ifNotNil: [ session at: #id ]).
-		#stack -> (body at: #stack ifAbsent: [ nil ]).
-	} asDictionary.
-
-	[
-		^ logDatabase
-			performOne: #insertClientLogRecord
-			statement: 	'INSERT INTO logs (timestamp, level, message, statusCode, accountId, sessionId, stack) VALUES (:timestamp, :level, :message, :statusCode, :accountId, :sessionId, :stack)'
-			bind: logRecord
-	] on: Error do: [ :error |
-		self warnCr: 'Failed to write log record: ', error printString.
-		^ nil ]
 ]
