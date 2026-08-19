@@ -150,10 +150,15 @@ CynBaseRestApiService class >> removeInstanceMethod: aCompiledMethod [
 
 	"If a method is removed unregister it (might not actually be registered, but just to be sure)"
 
-	| operation |
+	<clientEnvironment>
 
-	(self serviceImplementation isEndpointOperation: aCompiledMethod)
-		ifTrue: [ CpNodeJSRestEndpointOperation unregisterOperation: (operation := self serviceImplementation operationFor: aCompiledMethod) ].
+	| serviceImplementation operation |
+
+	serviceImplementation := self serviceImplementation
+		ifNil: [ ^ super removeInstanceMethod: aCompiledMethod ].
+
+	(serviceImplementation isEndpointOperation: aCompiledMethod)
+		ifTrue: [ CpNodeJSRestEndpointOperation unregisterOperation: (operation := serviceImplementation operationFor: aCompiledMethod) ].
 
 	super removeInstanceMethod: aCompiledMethod.
 

@@ -350,6 +350,8 @@ CynPropertyModel class >> removeClassMethod: aCompiledMethod [
 
 	"Remove thw specified CompiledMethod from the receiver"
 
+	<clientEnvironment>
+
 	super removeClassMethod: aCompiledMethod.
 
 	"Only if the propertySlots are already defined"
