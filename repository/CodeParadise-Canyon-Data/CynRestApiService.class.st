@@ -4,6 +4,13 @@ Class {
 	#category : #'CodeParadise-Canyon-Data-Service'
 }
 
+{ #category : #testing }
+CynRestApiService class >> isAbstractTag [
+
+	"The method is present to indicate the receiver is abstract.
+	This method will NOT be evaluated to decide if the receiver is abstract."
+]
+
 { #category : #'API - logging' }
 CynRestApiService >> clientLogRecordFrom: aDictionary [
 
