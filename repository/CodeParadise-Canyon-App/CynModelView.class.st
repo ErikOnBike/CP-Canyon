@@ -515,19 +515,20 @@ CynModelView >> handleInvalidModel: aDictionary [
 	containing the actual violations. The violation values are (is a
 	Collection of) either Symbols or CynTextReferences which indicate
 	the individual violations.
-	A nil key refers to a collection of violations on the Model which
+	A key #yourself refers to a collection of violations on the Model which
 	is not related to one specific property (like the Model's integrity
 	violations)."
 
-	(aDictionary includesKey: #yourself)
-		ifTrue: [
+	aDictionary
+		at: #yourself
+		ifPresent: [ :violations |
 			self app showToast: (String streamContents: [  :stream |
 				stream nextPutAll: #'app.form.violations' langText.
-				(aDictionary at: nil) do: [ :each |
+				violations do: [ :each |
 					stream
 						space ;
 						nextPutAll: each langText ] ]) ]
-		ifFalse: [
+		ifAbsent: [
 			| propertieLabels |
 
 			"Make sure the labels are in the same order as the properties on screen.
