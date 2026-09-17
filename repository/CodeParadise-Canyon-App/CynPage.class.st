@@ -203,7 +203,7 @@ CynPage >> close [
 	self destroy
 ]
 
-{ #category : #view }
+{ #category : #private }
 CynPage >> closeModalPage [
 
 	"Close the receiver.
@@ -212,7 +212,7 @@ CynPage >> closeModalPage [
 	self closeModalPage: #confirm
 ]
 
-{ #category : #view }
+{ #category : #private }
 CynPage >> closeModalPage: aSymbol [
 
 	"Close the receiver with specified role.
@@ -240,7 +240,9 @@ CynPage >> closeModalPage: aSymbol [
 				ifNil: [ modal dismiss await ].
 			modal destroy ].
 	previousPage ifNotNil: [
-		previousPage updateAfterNavigate ]
+		previousPage updateAfterNavigate ].
+
+	"The receiver is destroyed by the calling method"
 ]
 
 { #category : #accessing }
