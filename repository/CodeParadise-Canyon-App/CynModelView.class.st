@@ -702,7 +702,12 @@ CynModelView >> initialize [
 
 	(shadowRoot := self shadowRoot) firstChild
 		ifNotNil: [ :firstChild | shadowRoot insertChild: ionicStyle before: firstChild ]
-		ifNil: [ shadowRoot appendChild: ionicStyle ]
+		ifNil: [ shadowRoot appendChild: ionicStyle ].
+
+	"Also give receiver guidance on our operating mode"
+	self addClass: ((CpHtmlElement documentHtml isClassed: #md)
+		ifTrue: [ #md ]
+		ifFalse: [ #ios ])
 ]
 
 { #category : #initialization }
