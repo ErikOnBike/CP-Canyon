@@ -897,7 +897,7 @@ CynApp >> confirm: titleString action: actionString cancel: cancelString [
 { #category : #actions }
 CynApp >> confirm: titleString action: actionString cancel: cancelString onConfirm: aBlock [
 
-	"Ask the user for confirmation.
+	"Ask the user for confirmation and answer a Boolean stating whether the user confirmed.
 	A title, an action and a cancel option are shown.
 	An optional confirmation Block can be specified which will be evaluated before answering
 	(leaving the confirmation visible)."
@@ -2039,7 +2039,7 @@ CynApp >> showModal: aViewClass withModel: aModel onConfirm: aBlock [
 	"Show a Modal with the specified Model and perform the specified
 	Block (culled with the data from the Modal) on confirmed closing."
 
-	(self showModal: aViewClass withModel: aModel)
+	^ (self showModal: aViewClass withModel: aModel)
 		ifNotNil: [ :data | aBlock cull: data ]
 ]
 
