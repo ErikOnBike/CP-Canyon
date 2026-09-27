@@ -106,6 +106,8 @@ CynApp class >> constraintTextsEn [
 		at: #'constraint.length.min.zero' put: 'The input should be at least {1} characters long and is currently still empty.' ;
 		at: #'constraint.length.max' put: 'The input should have at most {1} characters and is {2} characters long.' ;
 		at: #'constraint.selection.unknown' put: 'The value "{1}" is not allowed.' ;
+		at: #'constraint.interval.outside' put: 'The value "{1}" is outside the allowed range.' ;
+		at: #'constraint.interval.format' put: 'The value "{1}" is not a number.' ;
 		yourself
 ]
 
@@ -144,6 +146,8 @@ CynApp class >> constraintTextsNl [
 		at: #'constraint.length.min.zero' put: 'De invoer moet minimaal {1} tekens lang zijn en is nu nog leeg.' ;
 		at: #'constraint.length.max' put: 'De invoer mag maximaal {1} tekens lang zijn en is nu {2} tekens lang.' ;
 		at: #'constraint.selection.unknown' put: 'De waarde "{1}" is niet toegestaan.' ;
+		at: #'constraint.interval.outside' put: 'De waarde "{1}" is buiten het toegestane bereik.' ;
+		at: #'constraint.interval.format' put: 'De waarde "{1}" is geen getal.' ;
 		yourself
 ]
 
