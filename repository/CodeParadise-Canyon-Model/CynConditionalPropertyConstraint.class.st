@@ -70,12 +70,6 @@ CynConditionalPropertyConstraint >> normalizeProperty: aSymbol in: aModel [
 		ifTrue: [ constraint normalizeProperty: aSymbol in: aModel ]
 ]
 
-{ #category : #accessing }
-CynConditionalPropertyConstraint >> possibleValues [
-
-	^ constraint possibleValues
-]
-
 { #category : #validating }
 CynConditionalPropertyConstraint >> violationsForValue: anObject in: aModel do: aBlock [
 

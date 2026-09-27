@@ -248,16 +248,6 @@ CynPropertyModel class >> nonCalculatedPropertySlotsDo: aBlock [
 			ifFalse: [ aBlock value: each ] ]
 ]
 
-{ #category : #accessing }
-CynPropertyModel class >> possibleValuesFromPropertyConstraintsAt: aSymbol do: aBlock [
-
-	"Evaluate the specified Block for each of the possible values of the specified property"
-
-	^ self propertyConstraintsAt: aSymbol do: [ :each |
-		each possibleValues do: [ :value |
-			aBlock value: value ] ]
-]
-
 { #category : #initialization }
 CynPropertyModel class >> postInstall [
 
@@ -871,22 +861,6 @@ CynPropertyModel >> propertyValuesDo: aBlock [
 
 	^ self class propertySlotsDo: [ :propertySlot |
 		propertySlot valueIn: self do: aBlock ]
-]
-
-{ #category : #constraints }
-CynPropertyModel >> propertyViolationsAt: aSymbol do: aBlock [
-
-	"Evaluate the specified Block for each violation in the specified
-	property of the receiver.
-	The Block will be evaluated with a key (a Symbol or CynTextReference)
-	representing the violation."
-
-	self class propertyConstraintsAt: aSymbol do: [ :each |
-
-		"Per constraint evaluate all violations. Use the 'long' form with
-		the model, since conditional constraints require access to the model.
-		Do NOT use #violationsIn:do: here."
-		each violationsForProperty: aSymbol in: self do: aBlock ]
 ]
 
 { #category : #private }

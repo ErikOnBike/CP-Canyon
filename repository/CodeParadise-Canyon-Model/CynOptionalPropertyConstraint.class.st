@@ -43,12 +43,6 @@ CynOptionalPropertyConstraint >> normalizeProperty: aSymbol in: aModel [
 	constraint normalizeProperty: aSymbol in: aModel
 ]
 
-{ #category : #accessing }
-CynOptionalPropertyConstraint >> possibleValues [
-
-	^ constraint possibleValues
-]
-
 { #category : #validating }
 CynOptionalPropertyConstraint >> violationsForValue: anObject in: aModel do: aBlock [
 

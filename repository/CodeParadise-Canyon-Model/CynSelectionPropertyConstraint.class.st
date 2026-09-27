@@ -34,12 +34,6 @@ CynSelectionPropertyConstraint >> initializeWithSelection: aCollection [
 ]
 
 { #category : #accessing }
-CynSelectionPropertyConstraint >> possibleValues [
-
-	^ selection
-]
-
-{ #category : #accessing }
 CynSelectionPropertyConstraint >> selection [
 
 	^ selection

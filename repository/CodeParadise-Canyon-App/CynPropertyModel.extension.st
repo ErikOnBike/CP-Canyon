@@ -114,6 +114,43 @@ CynPropertyModel >> labelFor: propertySymbol at: key [
 ]
 
 { #category : #'*CodeParadise-Canyon-App' }
+CynPropertyModel >> possibleValuesAndLabelsFor: aSymbol do: aBlock [
+
+	"Evaluate the specified Block for all values (and labels) for the specified property"
+
+	| sharedPossibleValues |
+
+	"Find possible values shared between all matching property constraints"
+	self class propertyConstraintsAt: aSymbol do: [ :each |
+		(each possibleValuesIn: self with: (self rawAt: aSymbol)) ifNotNil: [ :possibleValues |
+			sharedPossibleValues := sharedPossibleValues
+				ifNotNil: [ sharedPossibleValues select: [ :value | possibleValues includes: value ] ]
+				ifNil: [ possibleValues ] ] ].
+
+	"Evaluate the Block for the possible values"
+	sharedPossibleValues do: [ :each |
+		aBlock
+			value: each
+			value: (self labelFor: aSymbol at: each) ]
+]
+
+{ #category : #'*CodeParadise-Canyon-App' }
+CynPropertyModel >> propertyViolationsAt: aSymbol do: aBlock [
+
+	"Evaluate the specified Block for each violation in the specified
+	property of the receiver.
+	The Block will be evaluated with a key (a Symbol or CynTextReference)
+	representing the violation."
+
+	self class propertyConstraintsAt: aSymbol do: [ :each |
+
+		"Per constraint evaluate all violations. Use the 'long' form with
+		the model, since conditional constraints require access to the model.
+		Do NOT use #violationsIn:do: here."
+		each violationsForProperty: aSymbol in: self do: aBlock ]
+]
+
+{ #category : #'*CodeParadise-Canyon-App' }
 CynPropertyModel >> shortLabelAt: aSymbol [
 
 	"Answer the short label of the specified property

@@ -39,12 +39,6 @@ CynIndexedSelectionPropertyConstraint >> initializeWithIndices: aCollection [
 	indices := aCollection
 ]
 
-{ #category : #accessing }
-CynIndexedSelectionPropertyConstraint >> possibleValues [
-
-	^ indices
-]
-
 { #category : #validating }
 CynIndexedSelectionPropertyConstraint >> violationsForValue: anInteger in: aModel do: aBlock [
 
