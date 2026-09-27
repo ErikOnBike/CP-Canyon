@@ -37,6 +37,57 @@ CynText class >> text: aSymbol [
 		render
 ]
 
+{ #category : #accessing }
+CynText >> count [
+
+	^ (self propertyAt: #count)
+		ifNil: [
+			(self attributeAt: #count)
+				ifNotNil: [ :countString | countString asNumberOrNil ] ]
+]
+
+{ #category : #accessing }
+CynText >> count: anInteger [
+
+	self propertyAt: #count put: anInteger.
+
+	self render
+]
+
+{ #category : #accessing }
+CynText >> format [
+
+	^ (self propertyAt: #format)
+		ifNil: [
+			(self attributeAt: #format)
+				ifNotNil: [ :formatString | CpJavaScriptJSON parse: formatString ifFail: [ nil ] ] ]
+]
+
+{ #category : #accessing }
+CynText >> format: aDictionary [
+
+	self propertyAt: #format put: aDictionary.
+
+	self render
+]
+
+{ #category : #accessing }
+CynText >> index [
+
+	^ (self propertyAt: #index)
+		ifNil: [
+			(self attributeAt: #index)
+				ifNotNil: [ :indexString | indexString asNumberOrNil ] ]
+]
+
+{ #category : #accessing }
+CynText >> index: anInteger [
+
+	self propertyAt: #index put: anInteger.
+
+	self render
+]
+
 { #category : #initialization }
 CynText >> initialize [
 
@@ -45,24 +96,33 @@ CynText >> initialize [
 	self render
 ]
 
-{ #category : #initialization }
+{ #category : #'view - customization' }
 CynText >> render [
 
-	| index count |
-
-	index := (self attributeAt: #index)
-		ifNotNil: [ :indexString | indexString asNumberOrNil ].
-	count := (self attributeAt: #count)
-		ifNotNil: [ :countString | countString asNumberOrNil ].
-
 	"Set text if value provided as attribute"
-	(self attributeAt: #text) ifNotNil: [ :text |
-		self textContent: (index
-			ifNotNil: [ CynPropertyEntity index: index text: text asSymbol ]
+
+	self text ifNotNil: [ :text |
+		self textContent: (self index
+			ifNotNil: [ :index | CynPropertyEntity index: index text: text asSymbol format: self format ]
 			ifNil: [
-				count
-					ifNotNil: [ CynPropertyEntity count: count text: text asSymbol ]
-					ifNil: [ CynPropertyEntity text: text asSymbol ] ]) ]
+				self count
+					ifNotNil: [ :count | CynPropertyEntity count: count text: text asSymbol format: self format ]
+					ifNil: [ CynPropertyEntity text: text asSymbol format: self format ] ]) ]
+]
+
+{ #category : #accessing }
+CynText >> text [
+
+	^ (self propertyAt: #text)
+		ifNil: [ self attributeAt: #text ]
+]
+
+{ #category : #accessing }
+CynText >> text: aString [
+
+	self propertyAt: #text put: aString.
+
+	self render
 ]
 
 { #category : #'view - customization' }
