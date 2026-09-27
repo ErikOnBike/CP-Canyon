@@ -70,8 +70,8 @@ CynTextFormat >> at: keyObject [
 
 	result
 		ifNotNil: [
-			"Not a nice check. Update if subclasses of CpParamText are required or even more generic mechanisms.
-			Don't want to pollute the Object class with more #isParamText messages."
+			"Not a nice check. Update if subclasses of CynTextReference are required or even more generic mechanisms.
+			Don't want to pollute the Object class with more #isTextReference messages."
 			result class == CynTextReference
 				ifTrue: [ result := result textUsingLanguageText: languageText lang: language ] ]
 		ifNil: [
