@@ -228,13 +228,67 @@ CynApp class >> defaultAppTextsEn [
 			1 -> '1st'.
 			2 -> '2nd'.
 			3 -> '3rd'.
-			4 -> '4th'.
-			5 -> '5th'.
-			6 -> '6th'.
-			7 -> '7th'.
-			8 -> '8th'.
-			9 -> '9th'.
-			10 -> '10th' } asDictionary ;
+			21 -> '21st'.
+			22 -> '22nd'.
+			23 -> '23rd'.
+			31 -> '31st'.
+			32 -> '32nd'.
+			33 -> '33rd'.
+			41 -> '41st'.
+			42 -> '42nd'.
+			43 -> '43rd'.
+			51 -> '51st'.
+			52 -> '52nd'.
+			53 -> '53rd'.
+			61 -> '61st'.
+			62 -> '62nd'.
+			63 -> '63rd'.
+			71 -> '71st'.
+			72 -> '72nd'.
+			73 -> '73rd'.
+			81 -> '81st'.
+			82 -> '82nd'.
+			83 -> '83rd'.
+			91 -> '91st'.
+			92 -> '92nd'.
+			93 -> '93rd'.
+			#default -> '{index}th' } asDictionary ;
+		at: #'app.ordinal.long' put: {
+			1 -> 'first'.
+			2 -> 'second'.
+			3 -> 'third'.
+			4 -> 'fourth'.
+			5 -> 'fifth'.
+			6 -> 'sixth'.
+			7 -> 'seventh'.
+			8 -> 'eigth'.
+			9 -> 'ninth'.
+			10 -> 'tenth'.
+			21 -> '21st'.
+			22 -> '22nd'.
+			23 -> '23rd'.
+			31 -> '31st'.
+			32 -> '32nd'.
+			33 -> '33rd'.
+			41 -> '41st'.
+			42 -> '42nd'.
+			43 -> '43rd'.
+			51 -> '51st'.
+			52 -> '52nd'.
+			53 -> '53rd'.
+			61 -> '61st'.
+			62 -> '62nd'.
+			63 -> '63rd'.
+			71 -> '71st'.
+			72 -> '72nd'.
+			73 -> '73rd'.
+			81 -> '81st'.
+			82 -> '82nd'.
+			83 -> '83rd'.
+			91 -> '91st'.
+			92 -> '92nd'.
+			93 -> '93rd'.
+			#default -> '{index}th' } asDictionary ;
 		at: #'app.ordinal.last' put: 'last' ;
 		at: #'app.error.dontShowAgain' put: 'Don''t show again' ;
 		at: #'app.server.internalError.title' put: 'Oops, something went wrong' ;
@@ -311,17 +365,19 @@ CynApp class >> defaultAppTextsNl [
 			5 -> 'vr'.
 			6 -> 'za'.
 			7 -> 'zo' } asDictionary ;
-		at: #'app.ordinal' put: {
-			1 -> '1e'.
-			2 -> '2e'.
-			3 -> '3e'.
-			4 -> '4e'.
-			5 -> '5e'.
-			6 -> '6e'.
-			7 -> '7e'.
-			8 -> '8e'.
-			9 -> '9e'.
-			10 -> '10e' } asDictionary ;
+		at: #'app.ordinal' put: { #default -> '{index}e' } asDictionary ;
+		at: #'app.ordinal.long' put: {
+			1 -> 'eerste'.
+			2 -> 'tweede'.
+			3 -> 'derde'.
+			4 -> 'vierde'.
+			5 -> 'vijfde'.
+			6 -> 'zesde'.
+			7 -> 'zevende'.
+			8 -> 'achtste'.
+			9 -> 'negende'.
+			10 -> 'tiende'.
+			#default -> '{index}e' } asDictionary ;
 		at: #'app.ordinal.last' put: 'laatste' ;
 		at: #'app.error.dontShowAgain' put: 'Toon niet meer' ;
 		at: #'app.server.internalError.title' put: 'Oeps, er is iets fout gegaan' ;
