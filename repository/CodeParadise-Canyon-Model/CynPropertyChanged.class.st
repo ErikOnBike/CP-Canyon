@@ -45,10 +45,12 @@ CynPropertyChanged >> handlesAnnouncement: anAnnouncement [
 
 	Usage example:
 		self model when: (CpPropertyChanged name: #title) send: #titleChanged: to: self.
+		self model when: (CpPropertyChanged name: #state newValue: #special) send: #handleSpecialState: to: self.
 	"
 
 	^ (self class handlesAnnouncement: anAnnouncement)
-		and: [ self name = anAnnouncement name ]
+		and: [ self name = anAnnouncement name
+			and: [ self newValue isNil or: [ self newValue = anAnnouncement newValue ] ] ]
 ]
 
 { #category : #initialization }
