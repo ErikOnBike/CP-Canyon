@@ -14,8 +14,8 @@ IonSelect >> initializeForModel: aModel property: aSymbol [
 
 	selection := OrderedDictionary new.
 
-	aModel class possibleValuesFromPropertyConstraintsAt: aSymbol do: [ :each |
-		selection at: each put: (aModel labelFor: aSymbol at: each) ].
+	aModel possibleValuesAndLabelsFor: aSymbol do: [ :value :label |
+		selection at: value put: label ].
 
 	self makeEmpty.
 
