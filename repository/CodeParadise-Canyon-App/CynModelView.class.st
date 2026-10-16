@@ -251,7 +251,7 @@ CynModelView >> canNavigate [
 	allowNavigate := self app
 		selectAction: #'app.action.title.form.changes' langText from: {
 			IonActionSheetButton new
-				text: #'app.action.button.save' langText ;
+				text: #'app.button.label.generic.save' langText ;
 				data: [
 					self handleSubmitFormOnFailure: [ :violations |
 						violations
@@ -260,11 +260,11 @@ CynModelView >> canNavigate [
 						^ false ] ] ;
 				yourself.
 			IonActionSheetButton new
-				text: #'app.action.button.ignore' langText ;
+				text: #'app.button.label.generic.ignore' langText ;
 				data: [ self app showToast: #'app.toast.changes.ignored' langText ] ;
 				yourself.
 			IonActionSheetButton new
-				text: #'app.action.button.cancel' langText ;
+				text: #'app.button.label.generic.cancel' langText ;
 				role: #cancel ;
 				yourself }.
 

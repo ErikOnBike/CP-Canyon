@@ -940,7 +940,7 @@ CynApp >> confirm: titleString action: actionString [
 	^ self
 		confirm: titleString
 		action: actionString
-		cancel: #'app.action.button.cancel' langText
+		cancel: #'app.button.label.generic.cancel' langText
 		onConfirm: nil
 ]
 
@@ -998,7 +998,7 @@ CynApp >> confirm: titleString action: actionString onConfirm: aBlock [
 	^ self
 		confirm: titleString
 		action: actionString
-		cancel: #'app.action.button.cancel' langText
+		cancel: #'app.button.label.generic.cancel' langText
 		onConfirm: aBlock
 ]
 
