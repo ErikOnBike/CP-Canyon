@@ -387,6 +387,29 @@ CynPropertyEntity >> restWrite [
 ]
 
 { #category : #'*CodeParadise-Canyon-App' }
+CynPropertyEntity class >> summary: aCollection [
+
+	"Create a summary line of the elements in the specified Collection.
+
+	E.g. { 'one', 'two', 'three' } -> 'one, two and three'
+
+	It is assumed the 'and' is represented by the text lookup: #'app.and'
+	"
+
+	^ String streamContents: [ :stream |
+		| size |
+		size := aCollection size.
+
+		aCollection withIndexDo: [ :each :index |
+			index > 1
+				ifTrue: [
+					index = size
+						ifTrue: [ stream space ; nextPutAll: (self text: #'app.and') ; space ]
+						ifFalse: [ stream nextPutAll: ', ' ] ].
+			stream nextPutAll: each asString ] ]
+]
+
+{ #category : #'*CodeParadise-Canyon-App' }
 CynPropertyEntity class >> text: aSymbolOrParamText [
 
 	^ self text: aSymbolOrParamText format: nil
